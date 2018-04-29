@@ -1,0 +1,60 @@
+<html>
+
+    <head>
+        <title>WebFMU - Simulation</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="style.css"/>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <script type="text/x-mathjax-config">
+            MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+        </script>
+        <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_CHTML"></script>
+    </head>
+
+    <body>
+        <header>
+            <h1>HalliHallo !!!!!!!!!!!!!!!!!</h1>
+        </header>
+
+        <main>
+            <div id="test"></div>
+            <div id="formel"></div>
+            <div id="info"></div>
+        </main>
+        
+        <script>
+            
+            var xhttp = new XMLHttpRequest();
+            
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById("test").innerHTML = this.responseText;
+                }
+            };
+            xhttp.open("GET", "command?method=gettext", true);
+            xhttp.send();
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById("formel").innerHTML = this.responseText;
+                    MathJax.Hub.Typeset();
+                }
+            };
+            xhttp.open("GET", "info.txt", true);
+            xhttp.send();
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById("info").innerHTML = this.responseText;
+                }
+            };
+            xhttp.open("POST", "command?method=sendsettings", true);
+            xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhttp.send("Guten Tag!!!");
+
+        </script>
+    </body>
+    
+</html>
