@@ -93,6 +93,15 @@ column-count: 2;
 width: 50%;
 }
 
+.linkdiv {
+    width: 50%;
+    cursor: pointer;
+    text-align: center;
+    color: #ffffff;
+    background-color: #00cd66;
+    padding: 1px;
+}
+
 input[type=text], select {
 width: 100%;
 padding: 12px 20px;

@@ -18,6 +18,11 @@
         </header>
 
         <main>
+            <div class="linkdiv" onclick="test()"><p>Name</p></div>
+            <table>
+                <tr style="cursor: pointer;" onclick="test()"><th>Name</th></tr>
+                <tr><td>Hihi</td><td>Huhu</td></tr>
+            </table>
             <div id="test"></div>
             <div id="formel"></div>
             <div id="info"></div>
@@ -54,6 +59,10 @@
             xhttp.open("POST", "command?method=sendsettings", true);
             xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
             xhttp.send("Guten Tag!!!");
+            
+            function test(){
+                console.log(ich.getFullName())
+            }
 
         </script>
     </body>
