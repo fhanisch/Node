@@ -1,4 +1,7 @@
-// hello.cc
+// cl /nologo /IC:\Users\Felix\.node-gyp\10.6.0\include\node /EHsc hello.cpp /link /DLL /out:test.node C:\Users\Felix\.node-gyp\10.6.0\x64\node.lib
+// clang-cl /nologo /IC:\Users\Felix\.node-gyp\10.6.0\include\node /EHsc hello.cpp /link /DLL /out:test.node C:\Users\Felix\.node-gyp\10.6.0\x64\node.lib
+// clang -I C:\Users\Felix\.node-gyp\10.6.0\include\node hello.cpp -shared -o test.node -l C:\Users\Felix\.node-gyp\10.6.0\x64\node.lib
+// clang -I C:\Users\Felix\Downloads\node-10.8.0\src -I C:\Users\Felix\Downloads\node-10.8.0\deps\v8\include hello.cpp -shared -o test.node -l C:\Users\Felix\Downloads\node-10.8.0\Release\node.lib
 #include <stdio.h>
 #include <iostream>
 #include <node.h>
@@ -38,7 +41,7 @@ namespace demo {
 
 	void Method(const FunctionCallbackInfo<Value>& args) {
 		Isolate* isolate = args.GetIsolate();
-		args.GetReturnValue().Set(String::NewFromUtf8(isolate, "HalliHallo"));
+		args.GetReturnValue().Set(String::NewFromUtf8(isolate, "*** HalliHallo ***"));
 	}
 
 	void getNumber(const FunctionCallbackInfo<Value>& args)
@@ -110,7 +113,7 @@ namespace demo {
 		NODE_SET_METHOD(exports, "getNumber", getNumber);
 		NODE_SET_METHOD(exports, "myObjects", myObjects);
 	}
-
+#define NODE_GYP_MODULE_NAME TestModule
 	NODE_MODULE(NODE_GYP_MODULE_NAME, init)
 
 }  // namespace demo

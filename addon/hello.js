@@ -1,5 +1,5 @@
 // hello.js
-const addon = require('./build/Release/addon');
+const addon = require('./test');
 
 console.log(addon.hello());
 console.log(addon.getNumber());
