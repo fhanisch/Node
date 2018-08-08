@@ -1,3 +1,4 @@
+// clang -I C:\Users\Felix\Downloads\node-10.8.0\src mymodule.c -shared -o test.node -l C:\Users\Felix\Downloads\node-10.8.0\Release\node.lib
 #include <stdio.h>
 #include <string.h>
 #include <node_api.h>
@@ -6,7 +7,7 @@ napi_value myFunction(napi_env env, napi_callback_info info) {
 
 	napi_status status;
 	napi_value outstr;
-	char str[] = "HalliHallo";
+	char str[] = "Sabine steht hinter der Gardine!";
 
 	status = napi_create_string_utf8(env, str, strlen(str), &outstr);
 	if (status != napi_ok) {

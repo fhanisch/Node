@@ -1,4 +1,5 @@
-var addon = require('./build/Release/mymodule');
+//var addon = require('./build/Release/mymodule');
+var addon = require('./test');
 
 var Person = {};
 Person.name = 'Knecht Ruprecht';
