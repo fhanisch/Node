@@ -1,0 +1,32 @@
+.plan {
+	font-size: 20;
+	font-family: Arial;
+	background-color: rgb(35, 100, 240);
+	color: white;
+	width: 30%;
+	margin: 100px auto 100px auto;
+	padding: 50px;
+	border-radius: 15px;
+}
+
+table {
+	margin: auto;
+	font-size: 20;
+	color: white;
+	border-collapse: collapse;
+}
+
+th {
+	text-align: right;
+	font-weight: normal;
+}
+
+td,th {
+	padding: 10px 50px 10px 0px;
+	border-bottom: 1px solid rgb(255, 255, 255);
+}
+
+.gesamt {
+	font-weight: bold;
+	border: none;
+}
