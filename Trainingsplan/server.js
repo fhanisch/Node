@@ -18,8 +18,17 @@ const server = http.createServer(function(req, res){
 	console.log(req.url);
 	//console.log(q);
 	var filename;
-	if (req.url=="/") filename = "index.html";
-	else if (req.url=="/style.css") filename = "style.css";
+	var contentType;
+	if (req.url=="/") 
+	{
+		filename = "index.html";
+		contentType = "text/html";
+	}
+	else if (req.url=="/style.css")
+	{
+		filename = "style.css";
+		contentType = "text/css";
+	}
 	else 
 	{
 		res.statusCode = 404;
@@ -32,7 +41,7 @@ const server = http.createServer(function(req, res){
 			res.end();
 			return;
 		}
-		send(res, fdata, "text/html");
+		send(res, fdata, contentType);
 	});
 });
 

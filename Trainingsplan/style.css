@@ -3,7 +3,7 @@
 	font-family: Arial;
 	background-color: rgb(35, 100, 240);
 	color: white;
-	width: 30%;
+	width: fit-content;
 	margin: 100px auto 100px auto;
 	padding: 50px;
 	border-radius: 15px;
@@ -26,7 +26,7 @@ td,th {
 	border-bottom: 1px solid rgb(255, 255, 255);
 }
 
-.gesamt {
+#gesamt {
 	font-weight: bold;
 	border: none;
 }
