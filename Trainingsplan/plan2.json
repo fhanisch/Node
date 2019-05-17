@@ -1,0 +1,47 @@
+[
+	{
+		"distance": 400,
+		"count": 1,
+		"description": "Ein"
+	},
+	{
+		"distance": 25,
+		"count": 4,
+		"description": "S Sprint"
+	},
+	{
+		"distance": 500,
+		"count": 1,
+		"description": "100m K + 100m R im Wechsel"
+	},
+	{
+		"distance": 25,
+		"count": 4,
+		"description": "R Sprint"
+	},
+	{
+		"distance": 1000,
+		"count": 1,
+		"description": "4 x (200m K + 50m L-Reihenfolge)"
+	},
+	{
+		"distance": 25,
+		"count": 4,
+		"description": "B Sprint"
+	},
+	{
+		"distance": 1500,
+		"count": 1,
+		"description": "3 x (400m K + 100m kein K)"
+	},
+	{
+		"distance": 25,
+		"count": 4,
+		"description": "K Sprint"
+	},
+	{
+		"distance": 200,
+		"count": 1,
+		"description": "Aus"
+	}
+]

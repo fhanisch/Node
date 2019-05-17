@@ -4,27 +4,70 @@
 		<link rel="stylesheet" href="style.css">
 	</head>
 	<body>
-		<div class="plan">
-			<table>
-				<tr><th class="uebung" dist=400 count=1>400m</th><td>Ein</td></tr>
-				<tr><th class="uebung" dist=50 count=4>4x50m</th><td>25m WG + 25 GL lo</td></tr>
-				<tr><th class="uebung" dist=50 count=6>6x50m</th><td>25m K TÜ + 25 GL lo</td></tr>
-				<tr><th class="uebung" dist=550 count=4>4x550m</th><td>3x150m K 15s Pause<br>100m L 20s Pause</td></tr>
-				<tr><th class="uebung" dist=200 count=1>200m</th><td>Aus</td></tr>
-				<tr><th id="gesamt"></th></tr>
-			</table>
-		</div>
+		<div id="idPlan" class="plan"></div>
 		<script>
-			var sum = 0;
-			var uebungen = document.getElementsByClassName("uebung");
-			for (var i=0; i<uebungen.length; i++)
-			{
-				var d = uebungen[i].getAttribute("dist");
-				var c = uebungen[i].getAttribute("count");
-				sum = sum + d*c;
-			}
-			var gesamt = document.getElementById("gesamt");
-			gesamt.innerHTML = sum + "m";
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					var data = xhttp.response;
+					plan = document.getElementById("idPlan");
+					
+					table = document.createElement("table");
+					plan.appendChild(table);
+					for (var i=0; i<data.length; i++)
+					{
+						var tr = document.createElement("tr");
+						var th = document.createElement("th");
+						th.setAttribute("class", "uebung");
+						th.setAttribute("dist", data[i].distance);
+						th.setAttribute("count", data[i].count);
+						if (data[i].count==1)
+							th.innerHTML = data[i].distance + "m";
+						else
+							th.innerHTML = data[i].count + "x" + data[i].distance + "m";
+
+						var td = document.createElement("td");
+						td.innerHTML = data[i].description;
+						tr.appendChild(th);
+						tr.appendChild(td);
+						table.appendChild(tr);
+					}
+					var tr = document.createElement("tr");
+					var th = document.createElement("th");
+					th.setAttribute("id", "gesamt");
+					tr.appendChild(th);
+					table.appendChild(tr);
+
+					/*
+					var tableStr = "<table>";
+					for (var i=0; i<data.length; i++)
+					{
+						tableStr += "<tr><th class='uebung' dist=" + data[i].distance + " count=" + data[i].count + ">";
+						if (data[i].count==1)
+							tableStr += data[i].distance + "m</th>";
+						else
+							tableStr += data[i].count + "x" + data[i].distance + "m</th>";
+						tableStr += "<td>" + data[i].description + "</td></tr>";
+					}
+					tableStr += "<tr><th id='gesamt'></th></tr></table>";
+					plan.innerHTML = tableStr;
+					*/
+					
+					var sum = 0;
+					var uebungen = document.getElementsByClassName("uebung");
+					for (var i=0; i<uebungen.length; i++)
+					{
+						var d = uebungen[i].getAttribute("dist");
+						var c = uebungen[i].getAttribute("count");
+						sum = sum + d*c;
+					}
+					var gesamt = document.getElementById("gesamt");
+					gesamt.innerHTML = sum + "m";
+				}
+			};
+			xhttp.responseType = "json";
+			xhttp.open("GET", "getTable?id=1", true);
+			xhttp.send();
 		</script>
 	</body>
 </html>

@@ -1,0 +1,27 @@
+[
+	{
+		"distance": 400,
+		"count": 1,
+		"description": "Ein"
+	},
+	{
+		"distance": 50,
+		"count": 4,
+		"description": "25m WG + 25 GL lo"
+	},
+	{
+		"distance": 50,
+		"count": 6,
+		"description": "25m K TÜ + 25 GL lo"
+	},
+	{
+		"distance": 550,
+		"count": 4,
+		"description": "3x150m K 15s Pause<br>100m L 20s Pause"
+	},
+	{
+		"distance": 200,
+		"count": 1,
+		"description": "Aus"
+	}
+]
