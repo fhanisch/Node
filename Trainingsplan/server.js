@@ -29,7 +29,7 @@ const server = http.createServer(function(req, res){
 	var q = url.parse(req.url, true);
 	console.log(req.method);
 	console.log(req.url);
-	console.log(q.pathname);
+	console.log(q.query);
 	var filename;
 	var contentType;
 	if (req.url=="/") 
@@ -43,7 +43,7 @@ const server = http.createServer(function(req, res){
 	else if (q.pathname == "/getTable")
 	{
 		console.log("getTable");
-		sendFile(res, "plan2.json", "application/json")
+		sendFile(res, "plan"+q.query.id+".json", "application/json")
 	}
 	else 
 	{

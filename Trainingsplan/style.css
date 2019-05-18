@@ -1,12 +1,44 @@
+body {
+	font-family: Arial;
+}
+
 .plan {
 	font-size: 20;
-	font-family: Arial;
 	background-color: rgb(35, 100, 240);
 	color: white;
 	width: fit-content;
-	margin: 100px auto 100px auto;
+	margin: 100px auto 10px auto;
 	padding: 50px 70px;
 	border-radius: 15px;
+}
+
+.ctrl {
+	margin: 10px auto 10px auto;
+	width: fit-content;
+}
+
+.bttn {
+	font-size: 16;
+	color: rgb(255, 255, 255);
+	background-color: rgb(158, 158, 158);
+	border: none;
+	border-radius: 5px;
+	padding: 10px;
+	outline: none;
+}
+
+.bttn:hover {
+	background-color: rgb(63, 63, 63);
+	cursor: pointer;
+}
+
+.bttn:active {
+	background-color: rgb(197, 197, 197);
+}
+
+.bttn.disabled {
+	cursor: not-allowed;
+	background-color: rgb(197, 197, 197);
 }
 
 table {
