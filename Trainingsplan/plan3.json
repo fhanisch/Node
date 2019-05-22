@@ -17,7 +17,7 @@
 	{
 		"distance": 500,
 		"count": 3,
-		"description": "2x150m K 15s Pause<br>200m L 20s Pause"
+		"description": "2x150m K 15s Pause + 200m L 20s Pause<br>2x150m R 15s Pause + 200m L 20s Pause<br>2x150m KA 15s Pause + 200m L 20s Pause"
 	},
 	{
 		"distance": 100,
