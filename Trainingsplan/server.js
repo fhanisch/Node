@@ -11,6 +11,10 @@ console.log(process.argv);
 var relDir = path.dirname(path.relative("", process.argv[1]));
 console.log(relDir);
 
+fs.writeFile(relDir+'/test.log',new Date().toLocaleString()+": Server started.\n", { flag: 'a' }, function(err){
+
+});
+
 function send(res, buf, contentType)
 {
     res.writeHead(200, {'Content-Type': contentType});
