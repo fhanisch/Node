@@ -32,9 +32,16 @@ function sendFile(res, filename, contentType)
 
 const server = http.createServer(function(req, res){
 	var q = url.parse(req.url, true);
+	console.log(req.socket.remoteAddress);
+	console.log("Username: " + req.headers.username);
 	console.log(req.method);
 	console.log(req.url);
 	console.log(q.query);
+
+	fs.writeFile(relDir+'/test.log',new Date().toLocaleString()+": "+req.socket.remoteAddress+"\n", { flag: 'a' }, function(err){
+
+	});
+
 	var filename;
 	var contentType;
 	if (req.url=="/") 

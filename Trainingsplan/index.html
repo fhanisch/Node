@@ -87,6 +87,7 @@
 				};
 				xhttp.responseType = "json";
 				xhttp.open("GET", "getTable?id="+id, true);
+				xhttp.setRequestHeader("username", "felix");
 				xhttp.send();
 			}
 
