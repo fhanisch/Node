@@ -46,9 +46,7 @@ const server = http.createServer(function(req, res){
 	console.log(req.url);
 	console.log(q.query);
 
-	fs.writeFile(relDir+'/test.log',new Date().toLocaleString()+": "+req.socket.remoteAddress+"\n", { flag: 'a' }, function(err){
-
-	});
+	fs.writeFile(relDir+'/log/test.log',new Date().toLocaleString()+": "+req.socket.remoteAddress+"\n", { flag: 'a' }, function(err){});
 
 	var filename;
 	var contentType;
