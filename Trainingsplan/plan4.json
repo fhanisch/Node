@@ -1,8 +1,63 @@
 [
 	{
-		"distance": 400,
+		"distance": 300,
 		"count": 1,
 		"description": "Ein"
+	},
+	{
+		"distance": 50,
+		"count": 4,
+		"description": "25m WG + 25m bel."
+	},
+	{
+		"distance": 50,
+		"count": 6,
+		"description": "25m K TÜ + 25m K 3er Zug"
+	},
+	{
+		"distance": 100,
+		"count": 1,
+		"description": "K Be"
+	},
+	{
+		"distance": 200,
+		"count": 1,
+		"description": "L"
+	},
+	{
+		"distance": 300,
+		"count": 1,
+		"description": "B/R 50er Wechsel"
+	},
+	{
+		"distance": 400,
+		"count": 1,
+		"description": "K P/P"
+	},
+	{
+		"distance": 500,
+		"count": 1,
+		"description": "K jede 4. Bahn GA2"
+	},
+	{
+		"distance": 400,
+		"count": 1,
+		"description": "K P/P"
+	},
+	{
+		"distance": 300,
+		"count": 1,
+		"description": "B/R 50er Wechsel"
+	},
+	{
+		"distance": 200,
+		"count": 1,
+		"description": "L"
+	},
+	{
+		"distance": 100,
+		"count": 1,
+		"description": "K Be"
 	},
 	{
 		"distance": 200,
