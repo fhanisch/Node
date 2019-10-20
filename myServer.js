@@ -8,6 +8,7 @@ const server = http.createServer(function(req, res){
 	var q = url.parse(req.url, true);
 	console.log(req.method);
 	console.log(req.url);
+	console.log(req.headers);
 	console.log(q);
 	res.statusCode = 200;
 	res.setHeader('Content-Type', 'text/plain');
