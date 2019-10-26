@@ -140,7 +140,7 @@ function listFiles(isSecondTry, fileID)
 				hostname: 'www.googleapis.com',
 				port: 443,
 				//path: '/drive/v3/files' + fileID + '?key=' + apiKey,
-				path: '/drive/v3/files' + fileID + '?q=' + encodeURIComponent("mimeType='application/vnd.google-apps.folder'") + '&fields=files(id,name,mimeType,kind)&key=' + apiKey,
+				path: '/drive/v3/files' + '?q=' + encodeURIComponent("mimeType='application/vnd.google-apps.folder'") + '&fields=files(id,name,mimeType,kind)&key=' + apiKey,
 				//path: '/drive/v3/files' + fileID + '?q=' + encodeURIComponent("'myID123' in parents") + '&fields=files(id,name,mimeType)&key=' + apiKey,
 				method: 'GET',
 				headers: {'Authorization': 'Bearer ' + data.access_token, 'Accept': 'application/json'}
