@@ -139,7 +139,9 @@ function listFiles(isSecondTry, fileID)
 			var options = {
 				hostname: 'www.googleapis.com',
 				port: 443,
-				path: '/drive/v3/files' + fileID + '?key=' + apiKey,
+				//path: '/drive/v3/files' + fileID + '?key=' + apiKey,
+				path: '/drive/v3/files' + fileID + '?q=' + encodeURIComponent("mimeType='application/vnd.google-apps.folder'") + '&fields=files(id,name,mimeType,kind)&key=' + apiKey,
+				//path: '/drive/v3/files' + fileID + '?q=' + encodeURIComponent("'myID123' in parents") + '&fields=files(id,name,mimeType)&key=' + apiKey,
 				method: 'GET',
 				headers: {'Authorization': 'Bearer ' + data.access_token, 'Accept': 'application/json'}
 			}
@@ -184,12 +186,13 @@ function uploadFile(filename, folderID)
 	console.log("Upload File:");
 	readJsonFile(filename, function(data) {
 		var fileContent = JSON.stringify(data);
+		var strParts = filename.split(/\\|\//);
 		readJsonFile("apiSettings.json", function(data) {
 			var apiKey = data.api_key;
 			readJsonFile("token.json", function(data) {
 				console.log(apiKey);
 				console.log(data.access_token);
-				var metadata = JSON.stringify({ "name": filename, "parents": [folderID]});
+				var metadata = JSON.stringify({ "name": strParts.pop(), "parents": [folderID]});
 				var requestBody = "";
 				requestBody += "--foo_bar_baz\n";
 				requestBody += "Content-Type: application/json; charset=UTF-8\n\n";
@@ -197,7 +200,7 @@ function uploadFile(filename, folderID)
 				requestBody += "--foo_bar_baz\n";
 				requestBody += "Content-Type: application/json; charset=UTF-8\n\n";
 				requestBody += fileContent + "\n";
-				requestBody += "--foo_bar_baz--";
+				requestBody += "--foo_bar_baz--\n";
 	
 				var options = {
 					hostname: 'www.googleapis.com',
