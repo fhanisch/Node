@@ -126,10 +126,18 @@ function refreshToken(cb, args)
 	});
 }
 
-function listFiles(isSecondTry, fileID)
+function listFiles(isSecondTry, fileID, queryTerm)
 {
-	if (!fileID) var fileID = '';
-	else fileID = '/' + fileID;
+	if (!fileID) {
+		var fileID = '';
+		var fieldString = 'fields=files(id,name,mimeType,kind)&';
+	}
+	else {
+		fileID = '/' + fileID;
+		var fieldString = 'fields=id,name,mimeType,kind&';
+	}
+	if(!queryTerm) var queryString = '';
+	else var queryString = 'q=' + encodeURIComponent(queryTerm) + "&";
 	console.log("List Files:");
 	readJsonFile("apiSettings.json", function(data) {
 		var apiKey = data.api_key;
@@ -139,9 +147,7 @@ function listFiles(isSecondTry, fileID)
 			var options = {
 				hostname: 'www.googleapis.com',
 				port: 443,
-				//path: '/drive/v3/files' + fileID + '?key=' + apiKey,
-				path: '/drive/v3/files' + '?q=' + encodeURIComponent("mimeType='application/vnd.google-apps.folder'") + '&fields=files(id,name,mimeType,kind)&key=' + apiKey,
-				//path: '/drive/v3/files' + fileID + '?q=' + encodeURIComponent("'myID123' in parents") + '&fields=files(id,name,mimeType)&key=' + apiKey,
+				path: '/drive/v3/files' + fileID + '?' + queryString + fieldString + 'key=' + apiKey,
 				method: 'GET',
 				headers: {'Authorization': 'Bearer ' + data.access_token, 'Accept': 'application/json'}
 			}
@@ -249,7 +255,9 @@ for (i=0;i<myArgs.length;i++) {
 	else if (myArgs[i] == "-l") 
 	{
 		if (i == myArgs.length-1) {
-			listFiles(false);
+			listFiles(false, null, "name='Documente' and mimeType='application/vnd.google-apps.folder'");
+			//listFiles(false, null, "'id123' in parents");
+			//listFiles(false, "id123", null);
 		}
 		else {
 			var next = myArgs[i+1];
