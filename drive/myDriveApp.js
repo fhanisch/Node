@@ -27,20 +27,21 @@ function writeJsonFile(filename, data, cb)
 function httpRequest(options, body, cb)
 {
 	var req = https.request(options, res => {
-		console.log(`statusCode: ${res.statusCode}`)
+
+		console.log("Status Code: "+res.statusCode);
 	  
 		res.on('data', d => {
-			process.stdout.write(d);
-			if (cb) cb(res.statusCode, d);
+			//process.stdout.write(d);
+			cb(res.statusCode, d);
 		});
 	});
 	  
 	req.on('error', error => {
-		console.error(error)
-	})
+		console.error(error);
+	});
 	
 	if (body) req.write(body); //nur für POST requests
-	req.end()
+	req.end();
 }
 
 function generateAuthUrl()
@@ -87,76 +88,80 @@ function getAccessToken(code)
 	});
 }
 
-function refreshToken(cb, args)
+function refreshToken()
 {
-	console.log("Refresh Token:");
-	readJsonFile("myCredentials.json", function(data) {
-		var credentials = data.installed;
-		readJsonFile("token.json", function(data) {
-			var token = data;
-			var q = url.parse(credentials.token_uri, true);
-			console.log(q);
-			//evtl. encodeURIComponent verwenden
-			var requestBody = "client_id=" + credentials.client_id + "&client_secret=" + credentials.client_secret + "&refresh_token=" + token.refresh_token + "&grant_type=refresh_token";
-			console.log(requestBody);
+	return new Promise(function(resolve,reject){
+		console.log("Refresh Token:");
+		readJsonFile("myCredentials.json", function(data) {
+			var credentials = data.installed;
+			readJsonFile("token.json", function(data) {
+				var token = data;
+				var q = url.parse(credentials.token_uri, true);
+				//console.log(q);
+				//evtl. encodeURIComponent verwenden
+				var requestBody = "client_id=" + credentials.client_id + "&client_secret=" + credentials.client_secret + "&refresh_token=" + token.refresh_token + "&grant_type=refresh_token";
+				console.log(requestBody);
 
-			var options = {
-				hostname: q.hostname,
-				port: 443,
-				path: q.path,
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded',
-					'Content-Length': requestBody.length
+				var options = {
+					hostname: q.hostname,
+					port: 443,
+					path: q.path,
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+						'Content-Length': requestBody.length
+					}
 				}
-			}
 
-			httpRequest(options, requestBody, function(statusCode, data){
-				data = JSON.parse(data);
-				console.log("\n"+statusCode);
-				console.log(data);
-				token.access_token = data.access_token;
-				if (statusCode == 200) writeJsonFile("token.json", token, function(){
-					console.log("Token refreshed.");
-					cb(true, args);
+				httpRequest(options, requestBody, function(statusCode, data){
+					data = JSON.parse(data);
+					console.log(data);
+					token.access_token = data.access_token;
+					if (statusCode == 200) writeJsonFile("token.json", token, function(){
+						resolve("Token refreshed.");
+					});
+					else console.log("Refresh Token failed!");
 				});
-				else console.log("Refresh Token failed!");
 			});
 		});
 	});
 }
 
-function listFiles(isSecondTry, fileID, queryTerm)
+function listFiles(fileID, queryTerm)
 {
-	if (!fileID) {
-		var fileID = '';
-		var fieldString = 'fields=files(id,name,mimeType,kind)&';
-	}
-	else {
-		fileID = '/' + fileID;
-		var fieldString = 'fields=id,name,mimeType,kind&';
-	}
-	if(!queryTerm) var queryString = '';
-	else var queryString = 'q=' + encodeURIComponent(queryTerm) + "&";
-	console.log("List Files:");
-	readJsonFile("apiSettings.json", function(data) {
-		var apiKey = data.api_key;
-		readJsonFile("token.json", function(data) {
-			console.log(apiKey);
-			console.log(data.access_token);
-			var options = {
-				hostname: 'www.googleapis.com',
-				port: 443,
-				path: '/drive/v3/files' + fileID + '?' + queryString + fieldString + 'key=' + apiKey,
-				method: 'GET',
-				headers: {'Authorization': 'Bearer ' + data.access_token, 'Accept': 'application/json'}
-			}
-			httpRequest(options, null, function(status, data) {
-				//data = JSON.parse(data);
-				console.log("\n"+status);
-				console.log(data);
-				if (status !=200 && !isSecondTry) refreshToken(listFiles, fileID);
-				else if (status !=200 && isSecondTry) console.log("Second Try Failed!");
+	return new Promise(function(resolve,reject){
+		if (!fileID) {
+			fileID = '';
+			var fieldString = 'fields=files(id,name,kind)&'; // mimeType füht zu JSON.parse error ?!
+		}
+		else {
+			fileID = '/' + fileID;
+			var fieldString = 'fields=id,name,mimeType,kind&';
+		}
+		if(!queryTerm) queryString = '';
+		else queryString = 'q=' + encodeURIComponent(queryTerm) + "&";
+		console.log("List Files:");
+		readJsonFile("apiSettings.json", function(data) {
+			var apiKey = data.api_key;
+			readJsonFile("token.json", function(data) {
+				console.log(apiKey);
+				console.log(data.access_token);
+				var options = {
+					hostname: 'www.googleapis.com',
+					port: 443,
+					path: '/drive/v3/files' + fileID + '?' + queryString + fieldString + 'key=' + apiKey,
+					method: 'GET',
+					headers: {'Authorization': 'Bearer ' + data.access_token, 'Accept': 'application/json'}
+				}
+				httpRequest(options, null, function(statusCode, data) {
+					data = JSON.parse(data);
+					if (statusCode == 200) {
+						resolve(data);
+					}
+					else {
+						reject(data);
+					}
+				});
 			});
 		});
 	});
@@ -229,6 +234,97 @@ function uploadFile(filename, folderID)
 	});
 }
 
+async function parseArguments(args)
+{
+	var reuslt;
+	for (i=0;i<myArgs.length;i++) {
+
+		if (myArgs[i] == "-a") generateAuthUrl();
+		else if (myArgs[i] == "-t") {
+			if (i == myArgs.length-1){
+				console.log("No code input!");
+				process.exit(1);
+			}
+			else {
+				console.log(myArgs[i+1]);
+				getAccessToken(myArgs[i+1]);
+				i++;
+			}
+		}
+		else if (myArgs[i] == "-r") {
+			result = await refreshToken();
+			console.log(result);
+		}
+		else if (myArgs[i] == "-l") 
+		{
+			if (i == myArgs.length-1) {
+				//result = await listFiles(null, null);
+				try {
+					result = await listFiles(null, "name='Documente' and mimeType='application/vnd.google-apps.folder'");
+					console.log(result);
+				}
+				catch(err) {
+					console.log(err);
+					if (err.error.message == "Invalid Credentials") {
+						result = await refreshToken();
+						console.log(result);
+					}
+					else {
+						process.exit(1);
+					}
+				}
+				result = await listFiles(null, "'" + result.files[0].id + "'" + " in parents");
+				//result = await listFiles(null, "'" + result.files[0].id + "'" + " in parents and name='Wurf2.mo'");
+				console.log(result);
+				result = await listFiles(result.files[0].id, null);
+				console.log(result);
+			}
+			/*else {
+				var next = myArgs[i+1];
+				if (next[0] != '-') {
+					listFiles(myArgs[i+1], null);
+					i++;
+				} 
+				else listFiles(null, null);
+			}*/
+		}
+		else if (myArgs[i] == "-f") {
+			if (i == myArgs.length-1) {
+				console.log("No fileID input!");
+				process.exit(1);
+			}
+			else
+			{
+				var fileID = myArgs[i+1];
+				getFile(false, fileID);
+				if (fileID[0] == '-') {
+					console.log("No fileID input!");
+					process.exit(1);
+				}
+				i++;
+			}
+		}
+		else if (myArgs[i] == "-u") {
+			if (i == myArgs.length-1) {
+				console.log("No file input!");
+				process.exit(1);
+			}
+			else {
+				var file = myArgs[i+1];
+				console.log(file);
+				if (file[0] == '-') {
+					console.log("No file input!");
+					process.exit(1);
+				}
+				uploadFile(file, myArgs[i+2]);
+				i+=2;
+			}
+		}
+		else console.log("Unknown argument!");
+	
+	}
+}
+
 /* main */
 var myArgs = process.argv.slice(2);
 console.log('myArgs: ', myArgs);
@@ -238,68 +334,6 @@ if (myArgs.length == 0) {
 	process.exit(1);
 }
 
-for (i=0;i<myArgs.length;i++) {
+parseArguments(myArgs);
 
-	if (myArgs[i] == "-a") generateAuthUrl();
-	else if (myArgs[i] == "-t") {
-		if (i == myArgs.length-1){
-			console.log("No code input!");
-			process.exit(1);
-		}
-		else {
-			console.log(myArgs[i+1]);
-			getAccessToken(myArgs[i+1]);
-			i++;
-		}
-	}
-	else if (myArgs[i] == "-l") 
-	{
-		if (i == myArgs.length-1) {
-			listFiles(false, null, "name='Documente' and mimeType='application/vnd.google-apps.folder'");
-			//listFiles(false, null, "'id123' in parents");
-			//listFiles(false, "id123", null);
-		}
-		else {
-			var next = myArgs[i+1];
-			if (next[0] != '-') {
-				listFiles(false, myArgs[i+1]);
-				i++;
-			} 
-			else listFiles(false);
-		}
-	}
-	else if (myArgs[i] == "-f") {
-		if (i == myArgs.length-1) {
-			console.log("No fileID input!");
-			process.exit(1);
-		}
-		else
-		{
-			var fileID = myArgs[i+1];
-			getFile(false, fileID);
-			if (fileID[0] == '-') {
-				console.log("No fileID input!");
-				process.exit(1);
-			}
-			i++;
-		}
-	}
-	else if (myArgs[i] == "-u") {
-		if (i == myArgs.length-1) {
-			console.log("No file input!");
-			process.exit(1);
-		}
-		else {
-			var file = myArgs[i+1];
-			console.log(file);
-			if (file[0] == '-') {
-				console.log("No file input!");
-				process.exit(1);
-			}
-			uploadFile(file, myArgs[i+2]);
-			i+=2;
-		}
-	}
-	else console.log("Unknown argument!");
-
-}
+console.log("Hihi");
