@@ -32,11 +32,11 @@ function httpRequest(options, body, cb)
 		var contetntType = res.headers["content-type"];
 		console.log("ContentType: " + contetntType);
 	  
-		res.on('data', d => {
+		res.on('data', (d) => {
 			responeBody += d;
 		});
 
-		res.on('end', d => {
+		res.on('end', () => {
 			//process.stdout.write(responeBody);
 			if (contetntType.indexOf("json")>0) responeBody = JSON.parse(responeBody);
 			cb(res.statusCode, responeBody);
