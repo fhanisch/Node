@@ -27,12 +27,19 @@ function writeJsonFile(filename, data, cb)
 function httpRequest(options, body, cb)
 {
 	var req = https.request(options, res => {
-
-		console.log("Status Code: "+res.statusCode);
+		var responeBody = '';
+		console.log("Status Code: " + res.statusCode);
+		var contetntType = res.headers["content-type"];
+		console.log("ContentType: " + contetntType);
 	  
 		res.on('data', d => {
-			//process.stdout.write(d);
-			cb(res.statusCode, d);
+			responeBody += d;
+		});
+
+		res.on('end', d => {
+			//process.stdout.write(responeBody);
+			if (contetntType.indexOf("json")>0) responeBody = JSON.parse(responeBody);
+			cb(res.statusCode, responeBody);
 		});
 	});
 	  
@@ -80,7 +87,6 @@ function getAccessToken(code)
 		}
 
 		httpRequest(options, requestBody, function(statusCode, data){
-			data = JSON.parse(data);
 			console.log("\n"+statusCode);
 			console.log(data);
 			if (statusCode == 200) writeJsonFile("token.json", data);
@@ -114,7 +120,6 @@ function refreshToken()
 				}
 
 				httpRequest(options, requestBody, function(statusCode, data){
-					data = JSON.parse(data);
 					console.log(data);
 					token.access_token = data.access_token;
 					if (statusCode == 200) writeJsonFile("token.json", token, function(){
@@ -132,7 +137,7 @@ function listFiles(fileID, queryTerm)
 	return new Promise(function(resolve,reject){
 		if (!fileID) {
 			fileID = '';
-			var fieldString = 'fields=files(id,name,kind)&'; // mimeType füht zu JSON.parse error ?!
+			var fieldString = 'fields=files(id,name,mimeType,kind)&';
 		}
 		else {
 			fileID = '/' + fileID;
@@ -154,7 +159,6 @@ function listFiles(fileID, queryTerm)
 					headers: {'Authorization': 'Bearer ' + data.access_token, 'Accept': 'application/json'}
 				}
 				httpRequest(options, null, function(statusCode, data) {
-					data = JSON.parse(data);
 					if (statusCode == 200) {
 						resolve(data);
 					}
@@ -167,26 +171,30 @@ function listFiles(fileID, queryTerm)
 	});
 }
 
-function getFile(isSecondTry, fileID)
+function getFile(fileID)
 {
-	console.log("Get File:");
-	readJsonFile("apiSettings.json", function(data) {
-		var apiKey = data.api_key;
-		readJsonFile("token.json", function(data) {
-			console.log(apiKey);
-			console.log(data.access_token);
-			var options = {
-				hostname: 'www.googleapis.com',
-				port: 443,
-				path: '/drive/v3/files/' + fileID + '?key=' + apiKey + "&alt=media",
-				method: 'GET',
-				headers: {'Authorization': 'Bearer ' + data.access_token, 'Accept': 'application/json'} //TODO: Accept-Format checken!
-			}
-			httpRequest(options, null, function(status, data){
-				console.log("\n"+status);
-				console.log(data);
-				if (status !=200 && !isSecondTry) refreshToken(getFile, fileID);
-				else if (status !=200 && isSecondTry) console.log("Second Try Failed!");
+	return new Promise(function(resolve, rejected){
+		console.log("Get File:");
+		readJsonFile("apiSettings.json", function(data) {
+			var apiKey = data.api_key;
+			readJsonFile("token.json", function(data) {
+				console.log(apiKey);
+				console.log(data.access_token);
+				var options = {
+					hostname: 'www.googleapis.com',
+					port: 443,
+					path: '/drive/v3/files/' + fileID + '?key=' + apiKey + "&alt=media",
+					method: 'GET',
+					headers: {'Authorization': 'Bearer ' + data.access_token, 'Accept': 'application/json'} //TODO: Accept-Format checken!
+				}
+				httpRequest(options, null, function(statusCode, data){
+					if (statusCode == 200) {
+						resolve(data);
+					}
+					else {
+						reject(data);
+					}
+				});
 			});
 		});
 	});
@@ -194,40 +202,41 @@ function getFile(isSecondTry, fileID)
 
 function uploadFile(filename, folderID)
 {
-	console.log("Upload File:");
-	readJsonFile(filename, function(data) {
-		var fileContent = JSON.stringify(data);
-		var strParts = filename.split(/\\|\//);
-		readJsonFile("apiSettings.json", function(data) {
-			var apiKey = data.api_key;
-			readJsonFile("token.json", function(data) {
-				console.log(apiKey);
-				console.log(data.access_token);
-				var metadata = JSON.stringify({ "name": strParts.pop(), "parents": [folderID]});
-				var requestBody = "";
-				requestBody += "--foo_bar_baz\n";
-				requestBody += "Content-Type: application/json; charset=UTF-8\n\n";
-				requestBody += metadata + "\n\n";
-				requestBody += "--foo_bar_baz\n";
-				requestBody += "Content-Type: application/json; charset=UTF-8\n\n";
-				requestBody += fileContent + "\n";
-				requestBody += "--foo_bar_baz--\n";
-	
-				var options = {
-					hostname: 'www.googleapis.com',
-					port: 443,
-					path: '/upload/drive/v3/files' + '?key=' + apiKey + '&uploadType=multipart',
-					method: 'POST',
-					headers: {
-						'Content-Type': 'multipart/related; boundary=foo_bar_baz',
-						'Content-Length': requestBody.length,
-						'Authorization': 'Bearer ' + data.access_token,
-						'Accept': 'application/json'
+	return new Promise(function(resolve){
+		console.log("Upload File:");
+		readJsonFile(filename, function(data) {
+			var fileContent = JSON.stringify(data);
+			var strParts = filename.split(/\\|\//);
+			readJsonFile("apiSettings.json", function(data) {
+				var apiKey = data.api_key;
+				readJsonFile("token.json", function(data) {
+					console.log(apiKey);
+					console.log(data.access_token);
+					var metadata = JSON.stringify({ "name": strParts.pop(), "parents": [folderID]});
+					var requestBody = "";
+					requestBody += "--foo_bar_baz\n";
+					requestBody += "Content-Type: application/json; charset=UTF-8\n\n";
+					requestBody += metadata + "\n\n";
+					requestBody += "--foo_bar_baz\n";
+					requestBody += "Content-Type: application/json; charset=UTF-8\n\n";
+					requestBody += fileContent + "\n";
+					requestBody += "--foo_bar_baz--\n";
+		
+					var options = {
+						hostname: 'www.googleapis.com',
+						port: 443,
+						path: '/upload/drive/v3/files' + '?key=' + apiKey + '&uploadType=multipart',
+						method: 'POST',
+						headers: {
+							'Content-Type': 'multipart/related; boundary=foo_bar_baz',
+							'Content-Length': requestBody.length,
+							'Authorization': 'Bearer ' + data.access_token,
+							'Accept': 'application/json'
+						}
 					}
-				}
-				httpRequest(options, requestBody, function(status, data){
-					console.log("\n"+status);
-					console.log(data);
+					httpRequest(options, requestBody, function(statusCode, data){
+						resolve(data);
+					});
 				});
 			});
 		});
@@ -276,7 +285,6 @@ async function parseArguments(args)
 					}
 				}
 				result = await listFiles(null, "'" + result.files[0].id + "'" + " in parents");
-				//result = await listFiles(null, "'" + result.files[0].id + "'" + " in parents and name='Wurf2.mo'");
 				console.log(result);
 				result = await listFiles(result.files[0].id, null);
 				console.log(result);
@@ -292,17 +300,21 @@ async function parseArguments(args)
 		}
 		else if (myArgs[i] == "-f") {
 			if (i == myArgs.length-1) {
-				console.log("No fileID input!");
+				console.log("No filename input!");
 				process.exit(1);
 			}
 			else
 			{
-				var fileID = myArgs[i+1];
-				getFile(false, fileID);
-				if (fileID[0] == '-') {
-					console.log("No fileID input!");
+				var fileName = myArgs[i+1];
+				if (fileName[0] == '-') {
+					console.log("No filename input!");
 					process.exit(1);
 				}
+				result = await listFiles(null, "name='Documente' and mimeType='application/vnd.google-apps.folder'");
+				result = await listFiles(null, "'" + result.files[0].id + "'" + " in parents and name='" + fileName + "'");
+				console.log(result);
+				result = await getFile(result.files[0].id);
+				console.log(result);
 				i++;
 			}
 		}
@@ -318,8 +330,10 @@ async function parseArguments(args)
 					console.log("No file input!");
 					process.exit(1);
 				}
-				uploadFile(file, myArgs[i+2]);
-				i+=2;
+				result = await listFiles(null, "name='Documente' and mimeType='application/vnd.google-apps.folder'");
+				result = await uploadFile(file, result.files[0].id);
+				console.log(result);
+				i++;
 			}
 		}
 		else console.log("Unknown argument!");
