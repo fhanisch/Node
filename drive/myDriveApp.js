@@ -137,11 +137,11 @@ function listFiles(fileID, queryTerm)
 	return new Promise(function(resolve,reject){
 		if (!fileID) {
 			fileID = '';
-			var fieldString = 'fields=files(id,name,mimeType,kind)&';
+			var fieldString = 'fields=files(id,name,mimeType,kind,createdTime)&';
 		}
 		else {
 			fileID = '/' + fileID;
-			var fieldString = 'fields=id,name,mimeType,kind&';
+			var fieldString = 'fields=id,name,mimeType,kind,createdTime&';
 		}
 		if(!queryTerm) queryString = '';
 		else queryString = 'q=' + encodeURIComponent(queryTerm) + "&";
