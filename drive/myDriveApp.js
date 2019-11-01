@@ -268,6 +268,8 @@ async function parseArguments(args)
 					if (err.error.message == "Invalid Credentials") {
 						result = await refreshToken();
 						console.log(result);
+						result = await listFiles(null, "name='Documente' and mimeType='application/vnd.google-apps.folder'");
+						console.log(result);
 					}
 					else {
 						process.exit(1);
